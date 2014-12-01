@@ -7,7 +7,9 @@ import "fmt"
 
 // Reindexer represents process of moving data from one index to another
 type Reindexer struct {
-	es *goes.Connection
+	srcEs *goes.Connection
+	dstEs *goes.Connection
+
 	ch chan []goes.Document
 	wg *sync.WaitGroup
 
@@ -20,16 +22,17 @@ type Reindexer struct {
 	Log bool
 }
 
-// NewReindexer creates new reindexer with specified connection and indices
+// NewReindexer creates new reindexer with specified connections and indices
 // pool parameter identifies how many parallel indexing requests are allowed
-func NewReindexer(es *goes.Connection, src string, dst string, pool int) *Reindexer {
+func NewReindexer(srcEs, dstEs *goes.Connection, src, dst string, pool int) *Reindexer {
 	return &Reindexer{
-		es:   es,
-		ch:   make(chan []goes.Document, pool),
-		wg:   &sync.WaitGroup{},
-		src:  src,
-		dst:  dst,
-		done: make(chan error, pool),
+		srcEs: srcEs,
+		dstEs: dstEs,
+		ch:    make(chan []goes.Document, pool),
+		wg:    &sync.WaitGroup{},
+		src:   src,
+		dst:   dst,
+		done:  make(chan error, pool),
 	}
 }
 
@@ -41,7 +44,13 @@ func (r *Reindexer) Listen() {
 			for docs := range r.ch {
 				r.log(fmt.Sprintf("Got %d docs to index in listened #%d", len(docs), i))
 
-				_, err := r.es.BulkSend(r.dst, docs)
+				dstDocs := make([]goes.Document, 0, len(docs))
+				for _, doc := range docs {
+					doc.Index = r.dst
+					dstDocs = append(dstDocs, doc)
+				}
+
+				_, err := r.dstEs.BulkSend(dstDocs)
 				if err != nil {
 					r.done <- err
 				}
@@ -54,7 +63,8 @@ func (r *Reindexer) Listen() {
 
 // Suck starts pulling data out of elasticsearch and does reindexing
 func (r *Reindexer) Suck(query map[string]interface{}, timeout string, size int) error {
-	scan, err := r.es.Scan(query, []string{r.src}, []string{}, timeout, size)
+	r.log("starting reindexing")
+	scan, err := r.srcEs.Scan(query, []string{r.src}, []string{}, timeout, size)
 	if err != nil {
 		return err
 	}
@@ -66,7 +76,7 @@ func (r *Reindexer) Suck(query map[string]interface{}, timeout string, size int)
 	r.log(fmt.Sprintf("Found %d docs", scan.Hits.Total))
 
 	for {
-		response, err := r.es.Scroll(scan.ScrollId, timeout)
+		response, err := r.srcEs.Scroll(scan.ScrollId, timeout)
 		if err != nil {
 			return err
 		}
