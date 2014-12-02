@@ -20,16 +20,20 @@ data back into elasticsearch.
 Build it first:
 
 ```
-mkdir esreindex
-cd esreindex
-GOPATH=`pwd` go get github.com/bobrik/esreindexer/esreindex
+mkdir esreindexer
+cd esreindexer
+GOPATH=`pwd` go get github.com/bobrik/esreindexer/cmd/esreindexer
 ```
 
 This use the binary you've got to see the options:
 
 ```
-./bin/esreindex
+./bin/esreindexer
 ```
+
+#### Docker image
+
+Docker image is available too: `bobrik/esreindexer`.
 
 ### Authors
 
