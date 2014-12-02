@@ -4,6 +4,7 @@ import "github.com/belogik/goes"
 import "sync"
 import "log"
 import "fmt"
+import "time"
 
 // Reindexer represents process of moving data from one index to another
 type Reindexer struct {
@@ -50,9 +51,21 @@ func (r *Reindexer) Listen() {
 					dstDocs = append(dstDocs, doc)
 				}
 
-				_, err := r.dstEs.BulkSend(dstDocs)
-				if err != nil {
-					r.done <- err
+				for try := 1; ; try++ {
+					_, err := r.dstEs.BulkSend(dstDocs)
+					if err == nil {
+						break
+					}
+
+					if try <= 8 {
+						log.Println("error indexing, retrying", err)
+						time.Sleep(time.Second * 10)
+						continue
+					}
+
+					if err != nil {
+						r.done <- err
+					}
 				}
 
 				r.wg.Done()
