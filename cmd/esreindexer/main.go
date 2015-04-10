@@ -1,12 +1,15 @@
 package main
 
-import "flag"
-import "net/url"
-import "log"
-import "github.com/bobrik/esreindexer"
-import "github.com/belogik/goes"
-import "strings"
-import "encoding/json"
+import (
+	"encoding/json"
+	"flag"
+	"log"
+	"net/url"
+	"strings"
+
+	"github.com/belogik/goes"
+	"github.com/bobrik/esreindexer"
+)
 
 func main() {
 	src := flag.String("src", "", "source in format http://host:port/index")
@@ -21,22 +24,22 @@ func main() {
 		return
 	}
 
-	srcUrl, err := url.Parse(*src)
+	srcURL, err := url.Parse(*src)
 	if err != nil {
 		log.Fatal("error parsing", src, err)
 	}
 
-	dstUrl, err := url.Parse(*dst)
+	dstURL, err := url.Parse(*dst)
 	if err != nil {
 		log.Fatal("error parsing", dst, err)
 	}
 
-	if srcUrl.Path == "/" || dstUrl.Path == "/" {
+	if srcURL.Path == "/" || dstURL.Path == "/" {
 		log.Fatal("indices are invalid")
 	}
 
-	srcEs := urlToEs(srcUrl)
-	dstEs := urlToEs(dstUrl)
+	srcEs := urlToEs(srcURL)
+	dstEs := urlToEs(dstURL)
 
 	q := map[string]interface{}{}
 
@@ -45,7 +48,7 @@ func main() {
 		log.Fatal("query is invalid", err)
 	}
 
-	r := esreindexer.NewReindexer(srcEs, dstEs, srcUrl.Path[1:], dstUrl.Path[1:], *pool)
+	r := esreindexer.NewReindexer(srcEs, dstEs, srcURL.Path[1:], dstURL.Path[1:], *pool)
 	r.Log = true
 
 	r.Listen()

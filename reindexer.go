@@ -1,10 +1,13 @@
 package esreindexer
 
-import "github.com/belogik/goes"
-import "sync"
-import "log"
-import "fmt"
-import "time"
+import (
+	"fmt"
+	"log"
+	"sync"
+	"time"
+
+	"github.com/belogik/goes"
+)
 
 // Reindexer represents process of moving data from one index to another
 type Reindexer struct {
