@@ -1,5 +1,4 @@
-esreindexer
-===
+# esreindexer
 
 Makes reindexing of existing data in elasticsearch easy.
 
@@ -17,23 +16,13 @@ data back into elasticsearch.
 
 ### Usage
 
-Build it first:
+Use docker image:
 
 ```
-mkdir esreindexer
-cd esreindexer
-GOPATH=`pwd` go get github.com/bobrik/esreindexer/cmd/esreindexer
+docker run --rm -it bobrik/esreindexer
 ```
 
-This use the binary you've got to see the options:
-
-```
-./bin/esreindexer
-```
-
-#### Docker image
-
-Docker image is available too: `bobrik/esreindexer`.
+It will print command line options to use.
 
 ### Authors
 
