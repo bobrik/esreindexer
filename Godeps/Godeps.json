@@ -1,0 +1,15 @@
+{
+	"ImportPath": "github.com/bobrik/esreindexer",
+	"GoVersion": "go1.6",
+	"Deps": [
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "a4bbce9fcae005b22ae5443f6af064d80a6f5a55"
+		},
+		{
+			"ImportPath": "gopkg.in/olivere/elastic.v2",
+			"Comment": "v2.0.33",
+			"Rev": "2c5a3105cd1054dbd60d0f402c6218031a652362"
+		}
+	]
+}

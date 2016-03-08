@@ -5,8 +5,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/olivere/elastic"
 	"golang.org/x/net/context"
+	elastic "gopkg.in/olivere/elastic.v2"
 )
 
 // ReindexerOptionFunc is a function that configures reindexer

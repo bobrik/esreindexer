@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/bobrik/esreindexer"
-	"github.com/olivere/elastic"
 	"golang.org/x/net/context"
+	elastic "gopkg.in/olivere/elastic.v2"
 )
 
 type esQuery map[string]interface{}
@@ -26,7 +26,13 @@ func main() {
 	query := flag.String("query", "{\"match_all\":{}}", "query in json format")
 	pool := flag.Int("pool", 5, "how many indexers to start")
 	pack := flag.Int("pack", 1000, "scrolling size")
+
 	flag.Parse()
+
+	if *src == "" || *dst == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
 
 	q := esQuery(map[string]interface{}{})
 
